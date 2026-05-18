@@ -1,0 +1,12 @@
+.env
+
+# Ignore all .yaml with following exceptions: 
+*.yaml
+!templates/caddyfile-cm.yaml
+!templates/vaultwarden-cm.yaml
+!templates/secret.yaml
+!templates/server.yaml
+
+# Ignore Caddyfile
+Caddyfile
+!templates/Caddyfile

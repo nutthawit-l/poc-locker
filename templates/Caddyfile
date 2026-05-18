@@ -1,0 +1,31 @@
+<SUB1.DOMAIN.COM>, <SUB2.DOMAIN.COM> {
+        tls {
+                dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+                propagation_delay 2m
+                resolvers 1.1.1.1
+        }
+
+        log {
+                level INFO
+                output file /var/log/caddy/access.log
+        }
+
+        @vault host <SUB1.DOMAIN.COM>
+        handle @vault {
+                reverse_proxy vaultwarden:8081 {
+                        header_up X-Forwarded-For {http.request.header.Cf-Connecting-Ip}
+                }
+        }
+
+        @file host <SUB2.DOMAIN.COM>
+        handle @file {
+                reverse_proxy filebrowser:8082 {
+                        header_up X-Forwarded-For {http.request.header.Cf-Connecting-Ip}
+                }
+        }
+}
+
+localhost {
+        tls internal
+        respond /health 200
+}

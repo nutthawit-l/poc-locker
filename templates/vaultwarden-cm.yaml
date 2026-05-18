@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vaultwarden-env
+  namespace: default # podman uses "default" by default
+data:
+  DOMAIN: <YOUR_VAULTWARDEN_DOMAIN>
+  ROCKET_PORT: <YOUR_VAULTWARDEN_ROCKET_PORT>
