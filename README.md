@@ -2,6 +2,10 @@
 
 Tech stack included: Netbird, Caddy, Vaultwarden, Filebrowser
 
+## TODO
+
+Use Netbird DNS instead of Cloudflare
+
 ## Architecture
 
 
