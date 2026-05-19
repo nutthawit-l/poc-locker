@@ -1,14 +1,43 @@
-# Create Personal Locker that only you can access on Hetzner
+# Personal Locker on Hetzner
 
-Tech stack included: Netbird Cloud, Caddy, Vaultwarden, Filebrowser
+A self-hosted private service stack on a Hetzner VPS, accessible only through a Netbird VPN tunnel. No ports are exposed to the public internet.
+
+**Stack:** Netbird (VPN), Caddy (reverse proxy + internal TLS), Vaultwarden (password manager), dufs (file server)
 
 ## Architecture
 
+```
+  Client (PC / Laptop)
+          │
+          │  DNS: sub.domain.com → server.netbird.cloud → 100.115.x.x
+          │       (resolved via Netbird DNS zone)
+          │
+          │  HTTPS via Netbird VPN tunnel (wt0)
+          │
+┌─────────▼──────────── Hetzner Server -------──────────────────────┐
+│  firewalld: drop-all, allow 100.115.0.0/16 on 80/443              │
+│                                                                   │
+│  Netbird daemon  (host process — owns wt0 interface)              │
+│          │                                                        │
+│  ┌───────▼──────────── Podman Pod: locker ----────────────────┐   │
+│  │                                                            │   │
+│  │  ┌──────────────────┐    vault.domain.com                  │   │
+│  │  │  Caddy :80/:443  │ ──────────────────► Vaultwarden:8081 │   │
+│  │  │  (tls internal)  │    file.domain.com                   │   │
+│  │  └──────────────────┘ ──────────────────► dufs:5000        │   │
+│  │                                                            │   │          
+│  └────────────────────────────────────────────────────────----┘   │
+└──────────────────────────────────────────────────────────────-----┘
+```
 
-## Pre-requerist
+Netbird runs on the **host**, not in a container — running it inside a container confines the `wt0` interface to the container's network namespace, making the VPN route invisible to the host kernel.
 
-- Podman: 
-- Netbird account: For create SETUP_KEY token and setup the DNS
+Caddy uses `tls internal` (its own CA) instead of ACME. The CA cert (`caddy-root.crt`) must be trusted on each client machine and browser.
+
+## Prerequisites
+
+- **Podman** installed on the server (rootless)
+- **Netbird account** — needed to generate a `SETUP_KEY` for peer registration and to configure the DNS zone
 
 ## Setup the Server on Hetzner
 
