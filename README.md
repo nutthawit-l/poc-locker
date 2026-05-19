@@ -280,20 +280,22 @@ $ nc -zv $domain 22
 
 ### Trust the Caddy CA cert
 
-1. Copy to your PC or Laptop
+Caddy uses its own internal CA (`tls internal`), so clients need to trust its root certificate to avoid TLS errors. Do this once per client machine.
+
+1. Copy the CA cert from the server to your local machine via the Netbird peer address.
 
 ```console
-scp tie@<SERVER_PEER_ADDR>:~/caddy-root.crt .
+rsync -av tie@<SERVER_PEER_ADDR>:~/caddy-root.crt .
 ```
 
-2. Trust it
+2. Install the cert into the system trust store.
 
 ```console
 sudo cp caddy-root.crt /etc/pki/trust/anchors/caddy-root.crt
 sudo update-ca-certificates
 ```
 
-3. Test 
+3. Verify the cert is trusted by making HTTPS requests to your subdomains — both should return `200 OK` with no certificate errors.
 
 ```console
 curl -I https://<SUB1.DOMAIN.COM>
@@ -302,14 +304,14 @@ curl -I https://<SUB2.DOMAIN.COM>
 
 ### Trust on Browsers
 
-**For Firefox:**
+The system trust store is picked up automatically by Chrome/Chromium after a browser restart. Firefox manages its own certificate store and requires a manual import.
+
+**Firefox:**
 
 1. Go to `Settings` → `Privacy & Security` → scroll to `Certificates` → click `View Certificates`
 2. Go to `Authorities` tab → click `Import`
-3. Select the *caddy-root.crt* file you copied to your laptop
+3. Select the `caddy-root.crt` file you copied to your machine
 4. Check `Trust this CA to identify websites` → OK
-
-**For Chrome/Chromium** — nothing extra needed after running the two commands, just restart the browser.
 
 ## Appendix
 
