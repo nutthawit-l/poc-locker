@@ -61,10 +61,6 @@ spec:
       volumeMounts:
         - name: data-volume
           mountPath: /data
-        volumes:
-          - name: data-volume
-            persistentVolumeClaim:
-              claimName: dufs-data
   volumes:
     - name: caddy-file
       configMap:
@@ -87,6 +83,9 @@ spec:
     - name: vaultwarden-data
       persistentVolumeClaim:
         claimName: vaultwarden-data
+    - name: data-volume
+      persistentVolumeClaim:
+        claimName: dufs-data
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
