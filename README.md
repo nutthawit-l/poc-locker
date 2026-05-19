@@ -145,11 +145,11 @@ myhome
 
 ## Test with SSH access from client
 
-We will set firewall to allow SSH from only Netbird Peer.
+SSH is restricted to clients within the Netbird subnet. The client must be connected to Netbird before SSH will be reachable.
 
-1. First you need to install and start netbird service on client machine look at step 1 and 2 on: [Setup Netbird](#Setup Netbird)
+1. Install and start Netbird on the client machine — follow steps 1 and 2 from [Setup private connect with Netbird](#setup-private-connect-with-netbird).
 
-2. Allow firewall rule on the Server
+2. On the server, add a firewall rule to allow SSH from the Netbird subnet.
 
 ```console
 $ sudo firewall-cmd --permanent --zone="${ZONE}" --add-rich-rule='rule family="ipv4" source address="100.115.0.0/16" port port="22" protocol="tcp" accept'
@@ -159,7 +159,7 @@ $ sudo firewall-cmd --reload
 success
 ```
 
-3. Test SSH via Server peer address
+3. Verify SSH access using the server's Netbird peer address.
 
 ```console
 $ ssh <USER>@<SERVER_PEER_ADDR>
