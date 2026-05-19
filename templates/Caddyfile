@@ -15,7 +15,7 @@
 
         @file host <SUB2.DOMAIN.COM>
         handle @file {
-                reverse_proxy filebrowser:8082 {
+                reverse_proxy dufs:5000 {
                         header_up X-Forwarded-For {http.request.remoteip}
                 }
         }
