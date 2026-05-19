@@ -43,17 +43,15 @@ Caddy uses `tls internal` (its own CA) instead of ACME. The CA cert (`caddy-root
 
 ### Create the Server on Hetzner
 
-1. Prepare cloudinit file
+1. Copy the cloud-init template and fill in the two placeholders: `<YOUR_USER>` (the non-root user to create) and `<YOUR_SSH_PUB_KEY>` (your `~/.ssh/id_rsa.pub` content).
 
 ```console
 $ cp templates/leap16-cloudinit-example.yaml cloudinit.yaml
 ```
 
-Change `<YOUR_USER>` to username you will be create on the server.
+2. Provision a new VPS on Hetzner using the edited `cloudinit.yaml` as the user data.
 
-Change `<YOUR_SSH_PUB_KEY>` copy you `id_rsa.pub` and paste here.
-
-2. Create VM on Hetzner
+![Create Hetzner VPS](assets/create-hetzner-vps.png)
 
 ### Setup private connect with Netbird
 
