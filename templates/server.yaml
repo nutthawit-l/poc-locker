@@ -53,7 +53,7 @@ spec:
       volumeMounts:
         - name: vaultwarden-data
           mountPath: /data
-    - name: dufs-server
+    - name: dufs
       image: docker.io/sigoden/dufs:latest
       args: ["/data", "-A"]
       ports:
