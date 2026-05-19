@@ -167,39 +167,39 @@ $ ssh <USER>@<SERVER_PEER_ADDR>
 
 ### Deploy the Locker service
 
-1. Clone this repository on the server
+1. Clone this repository on the server.
 
 ```console
 server$ git clone https://github.com/nutthawit-l/poc-locker.git locker
 ```
 
-2. Copy *.env.example* to *.env* and replace all placeholder
+2. Copy `.env.example` to `.env` and fill in all placeholder values.
 
-3. Copy Caddyfile in templates directory `cp templates/Caddyfile Caddyfile` and replace `<SUB1.DOMAIN.COM>` and `<SUB2.DOMAIN.COM>` with you decine domains (e.g., `vault.example.com` and `file.example.com`)
+3. Copy the Caddyfile template and replace `<SUB1.DOMAIN.COM>` and `<SUB2.DOMAIN.COM>` with your chosen subdomains (e.g., `vault.example.com` and `file.example.com`).
 
-> **[Reference]**
+> **Reference**
 >  - https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
 >  - https://caddyserver.com/docs/caddyfile/directives/header
 
-4. Create Caddy image (I have added `dig` cli) 
+4. Build the custom Caddy image (adds `dig` for troubleshooting).
 
 ```console
 server$ make caddy-image
 ```
 
-5. Convert the *Caddyfile* to ConfigMap (This step run once when we make changed to the *Caddyfile*)
+5. Embed the Caddyfile into a Kubernetes ConfigMap. Re-run this whenever the Caddyfile changes.
 
 ```console
 server$ make caddy-file
 ```
 
-6. Create ConfigMap for *Vaultwarden* env
+6. Generate the Vaultwarden ConfigMap from `.env` values.
 
 ```console
 server$ make warden-env
 ```
 
-7. Run the service with Podman
+7. Copy the pod spec template, set the pod name, allow unprivileged binding on ports 80/443, then start the pod.
 
 ```console
 server$ cp templates/server.yaml server.yaml
@@ -209,7 +209,7 @@ server$ sudo sysctl -p
 server$ make server-up
 ```
 
-8. Log the caddy and looking for *enabling automatic TLS*
+8. Confirm Caddy has issued internal TLS certificates by checking the logs for the `enabling automatic TLS certificate management` message.
 
 ```console
 podman logs locker-caddy 2>&1 | tail -20
