@@ -340,3 +340,32 @@ $ sudo firewall-cmd --permanent --zone="${ZONE}" --remove-rich-rule='<ONE_LINE_A
 ```console
 distrobox-host-exec make server-up
 ```
+
+### Replace Caddyfile
+
+What should I do after update Caddyfile.
+
+1. Generate new ConfigMap
+
+```console
+make caddy-file
+```
+
+2. Replace the old one
+
+```console
+podman kube play --replace server.yaml --configmap caddyfile-cm.yaml --configmap vaultwarden-cm.yaml
+```
+
+3. Restart pod
+
+```console
+podman pod restart locker
+```
+
+4. Log the caddy and looking for *enabling automatic TLS*
+
+```console
+podman logs locker-caddy 2>&1 | tail -20
+{"level":"info","ts":1779150741.733714,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["<SUB.DOMAIN.COM>","<SUB.DOMAIN.COM>","localhost"]}
+```
