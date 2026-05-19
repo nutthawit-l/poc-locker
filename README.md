@@ -152,13 +152,13 @@ server$ git clone https://github.com/nutthawit-l/poc-locker.git locker
 
 2. Copy *.env.example* to *.env* and replace all placeholder
 
-3. Copy Caddyfile in templates directory `cp templates/Caddyfile Caddyfile` and replace `<SUB1.DOMAIN.COM>` and `<SUB2.DOMAIN.COM>` with you cloudflare registered domain (e.g., `vault.example.com` and `file.example.com`)
+3. Copy Caddyfile in templates directory `cp templates/Caddyfile Caddyfile` and replace `<SUB1.DOMAIN.COM>` and `<SUB2.DOMAIN.COM>` with you decine domains (e.g., `vault.example.com` and `file.example.com`)
 
 > **[Reference]**
 >  - https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
 >  - https://caddyserver.com/docs/caddyfile/directives/header
 
-4. Create Caddy image that include `github.com/caddy-dns/cloudflare` plugin, this used for auto renew certificate.
+4. Create Caddy image (I have added `dig` cli) 
 
 ```console
 server$ make caddy-image
@@ -195,10 +195,21 @@ podman logs locker-caddy 2>&1 | tail -20
 
 ### Access the service
 
-1. Now you need to point the DNS on Cloudflare to the *Server peer address*
+1. Create Netbird DNS Zone
 
-![Point DNS to Server peer address]()
+![Point DNS to Server peer address](file:///poc-locker/netbird-dns-zone.png)
 
+Create Netbird DNS Zone with your `<DOMAIN.COM>` and apply to *Home* distribution groups, which including my `pc` and `laptop` hosts.
+
+Create CNAME record with your `<SUB.DOMAIN.COM>` and point to the `server` hostname.
+
+Test connect with `dig` shold return the `<SERVER_HOSTNAME>.netbird.cloud`.
+
+```console
+dig +short <SUB.DOMAIN.COM>
+<SERVER_HOSTNAME>.netbird.cloud.
+<SERVER_PEER_ADDR>
+```
 
 2. Allow 80/443 and ICMP only from NetBird subnet
 
