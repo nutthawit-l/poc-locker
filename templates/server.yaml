@@ -48,8 +48,6 @@ spec:
             name: vaultwarden-env
       ports:
         - containerPort: 8081
-          hostPort: 8081
-          hostIP: 127.0.0.1
       volumeMounts:
         - name: vaultwarden-data
           mountPath: /data
