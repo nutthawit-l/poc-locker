@@ -315,6 +315,18 @@ curl -I https://<SUB2.DOMAIN.COM>
 
 ### Get Netbird SETUP_KEY
 
+A setup key is used to register a peer (server or client) to your Netbird network without interactive login.
+
+1. Go to the Netbird dashboard → **Setup Keys** → click **Create setup key**. Set a name, choose **Reusable** if you want to register multiple peers with the same key, and assign it to the appropriate group (e.g., *Home*).
+
+![Create new setup key - step 1](assets/create-new-setup-key-1.png)
+
+2. Copy the generated key immediately — it is only shown once.
+
+![Create new setup key - step 2](assets/create-new-setup-key-2.png)
+
+Use this key with `sudo netbird up --setup-key <YOUR_SETUP_KEY>` on each peer you want to register.
+
 ## Troubleshooting
 
 ### Failed to start pod
