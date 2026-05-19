@@ -218,15 +218,9 @@ podman logs locker-caddy 2>&1 | tail -20
 
 ### Access the service
 
-1. Create Netbird DNS Zone
+1. In the Netbird dashboard, create a DNS zone for `<DOMAIN.COM>` and apply it to the *Home* distribution group (the group that includes your client machines). Then add a CNAME record for each `<SUB.DOMAIN.COM>` pointing to the server's Netbird hostname. Verify that DNS resolves through the VPN — the result should chain through `<SERVER_HOSTNAME>.netbird.cloud` to the server's peer address.
 
-![Point DNS to Server peer address](file:///poc-locker/netbird-dns-zone.png)
-
-Create Netbird DNS Zone with your `<DOMAIN.COM>` and apply to *Home* distribution groups, which including my `pc` and `laptop` hosts.
-
-Create CNAME record with your `<SUB.DOMAIN.COM>` and point to the `server` hostname.
-
-Test connect with `dig` shold return the `<SERVER_HOSTNAME>.netbird.cloud`.
+![Point DNS to Server peer address](assets/netbird-dns-zone.png)
 
 ```console
 dig +short <SUB.DOMAIN.COM>
@@ -234,7 +228,7 @@ dig +short <SUB.DOMAIN.COM>
 <SERVER_PEER_ADDR>
 ```
 
-2. Allow 80/443 and ICMP only from NetBird subnet
+2. Open ports 80 and 443 on the server firewall for the Netbird subnet, and allow ICMP (ping) so connectivity can be verified.
 
 ```console
 server$ ZONE=myhome
@@ -274,7 +268,7 @@ myhome
   rich rules: 
 ```
 
-3. Test access the service 
+3. From the client, confirm DNS resolution and that ports 80 and 443 are reachable. Port 22 should be unreachable if the SSH rule was not added.
 
 ```console
 $ domain=<SUB.DOMAIN.COM>
