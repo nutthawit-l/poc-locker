@@ -1,10 +1,6 @@
 # Create Personal Locker that only you can access on Hetzner
 
-Tech stack included: Netbird, Caddy, Vaultwarden, Filebrowser
-
-## TODO
-
-Use Netbird DNS instead of Cloudflare
+Tech stack included: Netbird Cloud, Caddy, Vaultwarden, Filebrowser
 
 ## Architecture
 
@@ -12,8 +8,7 @@ Use Netbird DNS instead of Cloudflare
 ## Pre-requerist
 
 - Podman: 
-- Domain that registered on Cloudflare:
-- Netbird account: For create SETUP_KEY token
+- Netbird account: For create SETUP_KEY token and setup the DNS
 
 ## Setup the Server on Hetzner
 
@@ -181,13 +176,7 @@ server$ make caddy-file
 server$ make warden-env
 ```
 
-7. Create Secret for *CLOUDFLARE_API_TOKEN*
-
-```console
-server$ make secret
-```
-
-8. Run the service with Podman
+7. Run the service with Podman
 
 ```console
 server$ cp templates/server.yaml server.yaml
@@ -197,10 +186,11 @@ server$ sudo sysctl -p
 server$ make server-up
 ```
 
-9. Verify the Caddy can obtained certificate by look at Caddy log and search for `"msg":"certificate obtained successfully","identifier":"<SUB.DOMAIN.COM>",`
+8. Log the caddy and looking for *enabling automatic TLS*
 
 ```console
-podman logs -f locker-caddy
+podman logs locker-caddy 2>&1 | tail -20
+{"level":"info","ts":1779150741.733714,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["<SUB.DOMAIN.COM>","<SUB.DOMAIN.COM>","localhost"]}
 ```
 
 ### Access the service
@@ -259,6 +249,39 @@ $ nc -zv $domain 80
 $ nc -zv $domain 443
 $ nc -zv $domain 22
 ```
+
+### Trust the Caddy CA cert
+
+1. Copy to your PC or Laptop
+
+```console
+scp tie@<SERVER_PEER_ADDR>:~/caddy-root.crt .
+```
+
+2. Trust it
+
+```console
+sudo cp caddy-root.crt /etc/pki/trust/anchors/caddy-root.crt
+sudo update-ca-certificates
+```
+
+3. Test 
+
+```console
+curl -I https://<SUB1.DOMAIN.COM>
+curl -I https://<SUB2.DOMAIN.COM>
+```
+
+### Trust on Browsers
+
+**For Firefox:**
+
+1. Go to `Settings` → `Privacy & Security` → scroll to `Certificates` → click `View Certificates`
+2. Go to `Authorities` tab → click `Import`
+3. Select the *caddy-root.crt* file you copied to your laptop
+4. Check `Trust this CA to identify websites` → OK
+
+**For Chrome/Chromium** — nothing extra needed after running the two commands, just restart the browser.
 
 ## Appendix
 
@@ -361,11 +384,4 @@ podman kube play --replace server.yaml --configmap caddyfile-cm.yaml --configmap
 
 ```console
 podman pod restart locker
-```
-
-4. Log the caddy and looking for *enabling automatic TLS*
-
-```console
-podman logs locker-caddy 2>&1 | tail -20
-{"level":"info","ts":1779150741.733714,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["<SUB.DOMAIN.COM>","<SUB.DOMAIN.COM>","localhost"]}
 ```

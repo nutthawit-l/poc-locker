@@ -53,6 +53,18 @@ spec:
       volumeMounts:
         - name: vaultwarden-data
           mountPath: /data
+    - name: dufs-server
+      image: docker.io/sigoden/dufs:latest
+      args: ["/data", "-A"]
+      ports:
+        - containerPort: 5000
+      volumeMounts:
+        - name: data-volume
+          mountPath: /data
+        volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: dufs-data
   volumes:
     - name: caddy-file
       configMap:
@@ -141,3 +153,14 @@ spec:
   resources:
     requests:
       storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dufs-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
