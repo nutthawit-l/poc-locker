@@ -10,3 +10,6 @@
 # Ignore Caddyfile
 Caddyfile
 !templates/Caddyfile
+
+# Ignore all certificate files
+*.crt
