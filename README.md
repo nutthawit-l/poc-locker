@@ -55,9 +55,7 @@ $ cp templates/leap16-cloudinit-example.yaml cloudinit.yaml
 
 ### Setup private connect with Netbird
 
-1. Install Netbird
-
-We will install *netbird* on host. we not runs inside a container, because it creates the `wt0` interface and routing rules inside the container's network namespace, not the host's. So the host kernel never sees the route.
+1. Install Netbird on the host (not in a container — see [Architecture](#architecture)).
 
 ```console
 server$ sudo zypper addrepo https://pkgs.netbird.io/yum/ netbird
@@ -66,7 +64,7 @@ server$ sudo zypper in netbird
 
 [openSUSE netbird install - official site](https://docs.netbird.io/get-started/install/linux#open-suse-zypper)
 
-2. Start service
+2. Enable and connect using your server setup key.
 
 ```console
 server$ sudo systemctl enable --now netbird
@@ -76,7 +74,7 @@ Connected
 
 [Register machine using setup keys - official site](https://docs.netbird.io/manage/peers/register-machines-using-setup-keys#related-video-content)
 
-3. Verify service is started
+3. Confirm the `wt0` interface is up and the route is present.
 
 ```console
 server$ ip addr show wt0
@@ -89,11 +87,9 @@ server$ ip route show dev wt0
 <ADDR>/16 proto kernel scope link src <ADDR>
 ```
 
-4. Go to Netbird [Peers Dashboard](https://app.netbird.io/peers), if the server is runs successfully the peer is created automatically.
+4. Open the Netbird [Peers Dashboard](https://app.netbird.io/peers) and verify the server peer was registered automatically.
 
-![Verify Netbird Peer is created automatically after Netbird server is runs successfully](/home/tie/Pictures/Screenshots/poc-locker/verify-netbird-peer-auto-create-after-netbird-running-successfully.png)
-
-5. Allow traffic from Netbird
+5. Configure `firewalld`: set the default zone to `drop`, create a custom zone, and open UDP 51820 (Netbird WireGuard port).
 
 ```console
 server$ sudo firewall-cmd --list-all
