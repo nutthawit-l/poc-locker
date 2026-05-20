@@ -152,14 +152,14 @@ SSH is restricted to clients within the Netbird subnet. The client must be conne
 2. On the server, add a firewall rule to allow SSH from the Netbird subnet.
 
 ```console
-$ sudo firewall-cmd --permanent --zone="${ZONE}" --add-rich-rule='rule family="ipv4" source address="100.115.0.0/16" port port="22" protocol="tcp" accept'
+server$ sudo firewall-cmd --permanent --zone="${ZONE}" --add-rich-rule='rule family="ipv4" source address="100.115.0.0/16" port port="22" protocol="tcp" accept'
 success
 
-$ sudo firewall-cmd --reload
+server$ sudo firewall-cmd --reload
 success
 ```
 
-3. Verify SSH access using the server's Netbird peer address.
+3. On the client, verify SSH access using the server's Netbird peer address.
 
 ```console
 $ ssh <USER>@<SERVER_PEER_ADDR>
@@ -174,6 +174,10 @@ server$ git clone https://github.com/nutthawit-l/poc-locker.git locker
 ```
 
 2. Copy `.env.example` to `.env` and fill in all placeholder values.
+
+```console
+server$ cd locker && cp .env.example .env
+```
 
 3. Copy the Caddyfile template and replace `<SUB1.DOMAIN.COM>` and `<SUB2.DOMAIN.COM>` with your chosen subdomains (e.g., `vault.example.com` and `file.example.com`).
 
@@ -212,7 +216,7 @@ server$ make server-up
 8. Confirm Caddy has issued internal TLS certificates by checking the logs for the `enabling automatic TLS certificate management` message.
 
 ```console
-podman logs locker-caddy 2>&1 | tail -20
+server$ podman logs locker-caddy 2>&1 | tail -20
 {"level":"info","ts":1779150741.733714,"logger":"http","msg":"enabling automatic TLS certificate management","domains":["<SUB.DOMAIN.COM>","<SUB.DOMAIN.COM>","localhost"]}
 ```
 
@@ -282,17 +286,23 @@ $ nc -zv $domain 22
 
 Caddy uses its own internal CA (`tls internal`), so clients need to trust its root certificate to avoid TLS errors. Do this once per client machine.
 
-1. Copy the CA cert from the server to your local machine via the Netbird peer address.
+1. Copy the cert from Caddy pod to server.
 
 ```console
-rsync -av tie@<SERVER_PEER_ADDR>:~/caddy-root.crt .
+server$ podman exec locker-caddy cat /data/caddy/pki/authorities/local/root.crt > caddy-root.crt
+```
+
+2. Copy the CA cert from the server to your local machine via the Netbird peer address.
+
+```console
+$ rsync -av tie@<SERVER_PEER_ADDR>:/home/<USER>/locker/caddy-root.crt .
 ```
 
 2. Install the cert into the system trust store.
 
 ```console
-sudo cp caddy-root.crt /etc/pki/trust/anchors/caddy-root.crt
-sudo update-ca-certificates
+$ sudo cp caddy-root.crt /etc/pki/trust/anchors/
+$ sudo update-ca-certificates
 ```
 
 3. Verify the cert is trusted by making HTTPS requests to your subdomains — both should return `200 OK` with no certificate errors.
@@ -310,7 +320,7 @@ The system trust store is picked up automatically by Chrome/Chromium after a bro
 
 1. Go to `Settings` → `Privacy & Security` → scroll to `Certificates` → click `View Certificates`
 2. Go to `Authorities` tab → click `Import`
-3. Select the `caddy-root.crt` file you copied to your machine
+3. Select the `<SUB1.DOMAIN.COM>.crt` and `<SUB2.DOMAIN.COM>` file you copied to your machine
 4. Check `Trust this CA to identify websites` → OK
 
 ## Appendix
