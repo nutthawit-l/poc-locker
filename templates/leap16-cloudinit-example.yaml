@@ -1,0 +1,30 @@
+#cloud-config
+users:
+  - name: <YOUR_USER>
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    shell: /bin/bash
+    groups: users, wheel
+    home: /home/<YOUR_USER>
+    ssh_authorized_keys:
+      - <YOUR_SSH_PUB_KEY>
+    lock_passwd: false
+    # gen default password for <YOUR_USER> = mkpasswd -m sha-512 -R 4096 -S "ypjwfGRo0KK/EnM/" "yourpassword"
+    # e.g., password = toor, Change later after login successfully.
+    passwd: $6$rounds=4096$ypjwfGRo0KK/EnM/$ooQhr3L1eDIQRjyRw1ZF4MIcIlqFEq8VtStfnCtCOs8q7qIpSC.1qss2lGWURp9kX6ADJkZH.r82q6ECOmKf00
+package_update: true
+package_upgrade: true
+packages:
+  - bind-utils
+  - git
+  - jq
+  - make
+  - mtr
+  - netcat-openbsd
+  - neovim
+  - nmap
+  - podman
+  - strace
+  - telnet
+  - tmux
+  - traceroute
+  - whois
