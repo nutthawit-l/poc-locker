@@ -12,12 +12,6 @@ spec:
           hostPort: 80
         - containerPort: 443
           hostPort: 443
-      env:
-        - name: CLOUDFLARE_API_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: secret
-              key: CLOUDFLARE_API_TOKEN
       volumeMounts:
         - name: caddy-file
           mountPath: /etc/caddy/Caddyfile
