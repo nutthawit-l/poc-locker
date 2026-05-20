@@ -14,17 +14,18 @@ users:
 package_update: true
 package_upgrade: true
 packages:
-  - bind-utils
+  - tmux
   - git
+  - tree
+  - neovim
+  - yq
+  - podman
   - jq
   - make
   - mtr
   - netcat-openbsd
-  - neovim
-  - nmap
-  - podman
   - strace
   - telnet
-  - tmux
   - traceroute
   - whois
+  - nmap-parse-output
